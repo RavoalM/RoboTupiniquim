@@ -1,78 +1,96 @@
-﻿namespace RoboTupiniquim.ConsoleApp
+﻿using System.Text.RegularExpressions;
+
+namespace RoboTupiniquim.ConsoleApp;
+
+internal class Program
 {
-    internal class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        while (true)
         {
-            Console.Clear();
             Console.Write("Informe o limite do campo de pesquisa: ");
-            char[] Limite = Console.ReadLine().Replace(" ", "").ToCharArray();
+            string limiteInput = Console.ReadLine();
 
-            int xLimite = int.Parse(Limite[0].ToString());
-            int yLimite = int.Parse(Limite[1].ToString());
-
-            Console.Write("Informe o spawn do robo (use o modelo 1 2 N): ");
-            char[] spawn = Console.ReadLine().Replace(" ", "").ToUpper().ToCharArray();
-
-            int xInicial = int.Parse(spawn[0].ToString());
-            int yInicial = int.Parse(spawn[1].ToString());
-            char direcaoInicial = spawn[2];
-
-            Console.Write("Informe o comando: ");
-            char[] listaComando = Console.ReadLine().Replace(" ", "").ToUpper().ToCharArray();
-
-
-            foreach (char comando in listaComando)
+            if (!ValidarString(limiteInput))
             {
-                if (direcaoInicial == 'N')
+                Console.Clear();
+                Console.WriteLine("Erro! Informe o limite corretamente.");
+                Thread.Sleep(2000);
+                continue;
+            }
+
+            string[] limiteArray = limiteInput.Split(' ');
+            int xLimite = int.Parse(limiteArray[0]);
+            int yLimite = int.Parse(limiteArray[1]);
+
+            Console.Write("Informe o spawn do robo (Ex: 1 2 N): ");
+            string spawnInput = Console.ReadLine().ToUpper();
+
+            if (!Regex.IsMatch(spawnInput, @"^\d+\s\d+\s[N|S|L|O]$"))
+            {
+                Console.Clear();
+                Console.WriteLine("Erro! Informe a posição inicial corretamente (Ex: '1 2 N').");
+                Thread.Sleep(2000);
+                continue;
+            }
+
+            string[] spawnArray = spawnInput.Split(' ');
+            int xInicial = int.Parse(spawnArray[0]);
+            int yInicial = int.Parse(spawnArray[1]);
+            char direcaoInicial = char.Parse(spawnArray[2]);
+
+            Console.Write("Informe o comando (Apenas M, D ou E): ");
+            string comandosInput = Console.ReadLine().ToUpper().Trim();
+
+            if (!Regex.IsMatch(comandosInput, @"^[MDE]+$"))
+            {
+                Console.Clear();
+                Console.WriteLine("Erro! Comandos inválidos. Use apenas M, D ou E.");
+                Thread.Sleep(2000);
+                continue;
+            }
+
+            foreach (char comando in comandosInput)
+            {
+                if (comando == 'D')
                 {
-                    if (comando == 'D')
+                    if (direcaoInicial == 'N')
                     {
                         direcaoInicial = 'L';
                     }
-                    if (comando == 'E')
+                    else if (direcaoInicial == 'L')
+                    {
+                        direcaoInicial = 'S';
+                    }
+                    else if (direcaoInicial == 'S')
                     {
                         direcaoInicial = 'O';
+                    }
+                    else if (direcaoInicial == 'O')
+                    {
+                        direcaoInicial = 'N';
                     }
                 }
-
-                else if (direcaoInicial == 'S')
+                else if (comando == 'E')
                 {
-                    if (comando == 'D')
+                    if (direcaoInicial == 'N')
                     {
                         direcaoInicial = 'O';
                     }
-                    if (comando == 'E')
+                    else if (direcaoInicial == 'O')
+                    {
+                        direcaoInicial = 'S';
+                    }
+                    else if (direcaoInicial == 'S')
                     {
                         direcaoInicial = 'L';
                     }
-                }
-
-                else if (direcaoInicial == 'O')
-                {
-                    if (comando == 'D')
-                    {
-                        direcaoInicial = 'N';
-                    }
-                    if (comando == 'E')
-                    {
-                        direcaoInicial = 'S';
-                    }
-                }
-
-                else if (direcaoInicial == 'L')
-                {
-                    if (comando == 'D')
-                    {
-                        direcaoInicial = 'S';
-                    }
-                    if (comando == 'E')
+                    else if (direcaoInicial == 'L')
                     {
                         direcaoInicial = 'N';
                     }
                 }
-
-                if (comando == 'M')
+                else if (comando == 'M')
                 {
                     if (direcaoInicial == 'N')
                     {
@@ -90,21 +108,24 @@
                     {
                         xInicial++;
                     }
-
                 }
             }
 
             if (xInicial < 0 || xInicial > xLimite || yInicial < 0 || yInicial > yLimite)
             {
-                Console.WriteLine("O robo saiu do campo de pesquisa");
+                Console.WriteLine("O robo saiu do campo de pesquisa.");
+                break;
             }
             else
             {
-
                 Console.WriteLine($"Posição final do robo: {xInicial} {yInicial} {direcaoInicial}");
+                break;
             }
-
         }
+    }
 
+    static bool ValidarString(string input)
+    {
+        return Regex.IsMatch(input, @"^\d+\s\d+$");
     }
 }
