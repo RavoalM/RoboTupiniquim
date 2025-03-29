@@ -97,6 +97,8 @@ internal class Program
             {
                 posicoesFinais.Add($"{xInicial} {yInicial} {direcaoInicial}");
                 Console.WriteLine($"Posição final do robo {i + 1}: {posicaoFinal}");
+                Console.Write("Pressione qualquer tecla para continuar...");
+                Console.ReadLine();
             }
         }
 
