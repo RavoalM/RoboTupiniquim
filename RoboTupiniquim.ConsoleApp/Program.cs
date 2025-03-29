@@ -91,15 +91,14 @@ internal class Program
             else if (posicoesFinais.Contains($"{xInicial} {yInicial}"))
             {
                 Console.WriteLine("Colisão detectada! Dois robôs não podem ocupar a mesma posição.");
-                return;
+
             }
             else
             {
                 posicoesFinais.Add($"{xInicial} {yInicial} {direcaoInicial}");
                 Console.WriteLine($"Posição final do robo {i + 1}: {posicaoFinal}");
-                Console.Write("Pressione qualquer tecla para continuar...");
-                Console.ReadLine();
             }
+
         }
 
         if (robosForaDoCampo.Count > 0)
@@ -121,9 +120,13 @@ internal class Program
             Console.WriteLine(posicao);
         }
 
+        Console.Write("Pressione qualquer tecla para fechar...");
+        Console.ReadLine();
+
         static bool ValidarString(string input)
         {
             return Regex.IsMatch(input, @"^\d+\s\d+$");
         }
+
     }
 }
