@@ -91,7 +91,6 @@ internal class Program
             else if (posicoesFinais.Contains($"{xInicial} {yInicial}"))
             {
                 Console.WriteLine("Colisão detectada! Dois robôs não podem ocupar a mesma posição.");
-
             }
             else
             {
