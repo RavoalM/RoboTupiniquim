@@ -58,61 +58,98 @@ internal class Program
 
             foreach (char comando in comandosInput)
             {
-                if (comando == 'D')
+                if (comando == 'D' || comando == 'E')
                 {
-                    if (direcaoInicial == 'N') direcaoInicial = 'L';
-                    else if (direcaoInicial == 'L') direcaoInicial = 'S';
-                    else if (direcaoInicial == 'S') direcaoInicial = 'O';
-                    else if (direcaoInicial == 'O') direcaoInicial = 'N';
-                }
-                else if (comando == 'E')
-                {
-                    if (direcaoInicial == 'N') direcaoInicial = 'O';
-                    else if (direcaoInicial == 'O') direcaoInicial = 'S';
-                    else if (direcaoInicial == 'S') direcaoInicial = 'L';
-                    else if (direcaoInicial == 'L') direcaoInicial = 'N';
+                    direcaoInicial = Virar(direcaoInicial, comando);
                 }
                 else if (comando == 'M')
                 {
-                    if (direcaoInicial == 'N') yInicial++;
-                    else if (direcaoInicial == 'S') yInicial--;
-                    else if (direcaoInicial == 'L') xInicial++;
-                    else if (direcaoInicial == 'O') xInicial--;
+                    (xInicial, yInicial) = MovimentarRobo(xInicial, yInicial, direcaoInicial);
                 }
             }
 
-            string posicaoFinal = $"{xInicial} {yInicial} {direcaoInicial}";
+            Resultados(xInicial, yInicial, direcaoInicial, xLimite, yLimite, i, posicoesFinais, robosForaDoCampo);
 
-            if (xInicial < 0 || xInicial > xLimite || yInicial < 0 || yInicial > yLimite)
-            {
-                Console.WriteLine($"O robo {i + 1} saiu do campo de pesquisa.");
-                robosForaDoCampo.Add(i + 1);
-            }
-            else if (posicoesFinais.Contains($"{xInicial} {yInicial}"))
-            {
-                Console.WriteLine("Colisão detectada! Dois robôs não podem ocupar a mesma posição.");
-            }
-            else
-            {
-                posicoesFinais.Add($"{xInicial} {yInicial} {direcaoInicial}");
-                Console.WriteLine($"Posição final do robo {i + 1}: {posicaoFinal}");
-            }
-
+            ForaDoCampo(xInicial, yInicial, xLimite, yLimite, i, robosForaDoCampo);
         }
 
-        if (robosForaDoCampo.Count > 0)
+        PosicaoFinal(posicoesFinais);
+    }
+    static bool ValidarString(string input)
+    {
+        return Regex.IsMatch(input, @"^\d+\s\d+$");
+    }
+
+    static char Virar(char direcaoAtual, char comando)
+    {
+        if (comando == 'D')
         {
-            Console.WriteLine("\nOs seguintes robôs saíram do campo de pesquisa:");
-            foreach (var robo in robosForaDoCampo)
-            {
-                Console.WriteLine($"Robô {robo}");
-            }
+            if (direcaoAtual == 'N') return 'L';
+            if (direcaoAtual == 'L') return 'S';
+            if (direcaoAtual == 'S') return 'O';
+            if (direcaoAtual == 'O') return 'N';
+        }
+        else if (comando == 'E')
+        {
+            if (direcaoAtual == 'N') return 'O';
+            if (direcaoAtual == 'O') return 'S';
+            if (direcaoAtual == 'S') return 'L';
+            if (direcaoAtual == 'L') return 'N';
+        }
+
+        return direcaoAtual;
+    }
+
+    static (int, int) MovimentarRobo(int xInicial, int yInicial, char direcaoInicial)
+    {
+        if (direcaoInicial == 'N') yInicial++;
+        else if (direcaoInicial == 'S') yInicial--;
+        else if (direcaoInicial == 'L') xInicial++;
+        else if (direcaoInicial == 'O') xInicial--;
+        return (xInicial, yInicial);
+    }
+
+    static void Resultados(int xInicial, int yInicial, char direcaoInicial, int xLimite, int yLimite, int i, List<string> posicoesFinais, List<int> robosForaDoCampo)
+    {
+        string posicaoFinal = $"{xInicial} {yInicial} {direcaoInicial}";
+
+        if (xInicial < 0 || xInicial > xLimite || yInicial < 0 || yInicial > yLimite)
+        {
+            Console.WriteLine($"O robô {i + 1} saiu do campo de pesquisa.");
+            robosForaDoCampo.Add(i + 1);
+        }
+        else if (posicoesFinais.Contains($"{xInicial} {yInicial}"))
+        {
+            Console.WriteLine("Colisão detectada! Dois robôs não podem ocupar a mesma posição.");
         }
         else
         {
-            Console.WriteLine("\nNenhum robô saiu do campo de pesquisa.");
+            posicoesFinais.Add(posicaoFinal);
+            Console.WriteLine($"Posição final do robô {i + 1}: {posicaoFinal}");
         }
+    }
 
+    static void ForaDoCampo(int xInicial, int yInicial, int xLimite, int yLimite, int i, List<int> robosForaDoCampo)
+    {
+        if (xInicial < 0 || xInicial > xLimite || yInicial < 0 || yInicial > yLimite)
+        {
+            if (robosForaDoCampo.Count > 0)
+            {
+                Console.WriteLine("\nOs seguintes robôs saíram do campo de pesquisa:");
+                foreach (var robo in robosForaDoCampo)
+                {
+                    Console.WriteLine($"Robô {robo}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("\nNenhum robô saiu do campo de pesquisa.");
+            }
+        }
+    }
+
+    static void PosicaoFinal(List<string> posicoesFinais)
+    {
         Console.WriteLine("\nAs posições dos robôs são:");
         foreach (var posicao in posicoesFinais)
         {
@@ -121,11 +158,7 @@ internal class Program
 
         Console.Write("Pressione qualquer tecla para fechar...");
         Console.ReadLine();
-
-        static bool ValidarString(string input)
-        {
-            return Regex.IsMatch(input, @"^\d+\s\d+$");
-        }
-
     }
 }
+
+
